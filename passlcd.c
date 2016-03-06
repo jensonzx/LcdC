@@ -12,7 +12,8 @@
 void port_init(), keycheck(), endp(), setPass(), entpw();
 char keyscan();
 char pass[5], key[5];
-unsigned int count = 0, match(), z;
+unsigned int count = 0;
+int match(), z;
 
 int main()
 {
