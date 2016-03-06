@@ -11,28 +11,29 @@
 
 void port_init(), keycheck(), endp(), setPass();
 char keyscan();
-char pass[5], key[4];
+char pass[5], key[5];
 unsigned int count = 0;
 
 int main()
 {
-    unsigned int a;
-    port_init();
-    Lcd_Init();
-    while(1)
-    {
-    	Lcd_Clear();
-	// Intro
-	Lcd_Set_Cursor(1,1);
-        Lcd_Write_String("B23 CE");
-	Lcd_Set_Cursor(2,1);
-	Lcd_Write_String("Password lock");
-	__delay_ms(1000);
-	setPass();
+	unsigned int a;
+	port_init();
+	Lcd_Init();
+	while(1)
+	{
+		Lcd_Clear();
+		// Intro
+		Lcd_Set_Cursor(1,1);
+		Lcd_Write_String("B23 CE");
+		Lcd_Set_Cursor(2,1);
+		Lcd_Write_String("Password lock");
+		__delay_ms(1000);
+		setPass();
 	
-	endp();
-    }
-    return 0;
+
+		endp();
+	}
+	return 0;
 }
 
 // Initialize all ports
@@ -53,7 +54,7 @@ char keyscan() {
 		else if (RB2 == 1)
 			return '7';
 		else if (RB3 == 1)
-			return '-';
+			return '*';
 
 		PORTB = 0b00100000;
 		if	(RB0 == 1)
@@ -95,38 +96,34 @@ void endp() {
 void setPass() {
 	unsigned int i = 0;
 	// Set password
-wr:	Lcd_Clear();
+ts:	Lcd_Clear();
 	Lcd_Set_Cursor(1,1);
 	Lcd_Write_String("Set password:");
 	Lcd_Set_Cursor(2,1);
 
 	while (i < 5) {
 		pass[i] = keyscan();
-		/* Checks if #(OK) is pressed
-		If key count is less than 4, it will
-		display to user that the password is too short */
-		if (pass[i] == '#') {
-			if (i < 4) {
-				Lcd_Clear();
+		if (pass[i] == '#') {	// Checks if #(OK) is pressed
+			if (i < 4) { 		// If key count is less than 4, it will
+				Lcd_Clear();	// display to user that the password is too short
 				Lcd_Write_String("Too short");
 				__delay_ms(1500);
-				i = 0; // Resets function
-				goto wr;
+				i = 0;			// Resets function
+				goto ts;
 			}
 			else {
 				i++;
 			}
 		}
-		// Erase the most recent key
-		else if (pass[i] != '-' && i < 4) {
-			Lcd_Write_Char(pass[i]);
-			i++;
-		}
-		else if (i > 0 && pass[i] == '-'){
+		else if (i > 0 && pass[i] == '*'){ // Erase the most recent key
 			Lcd_Set_Cursor(2,i);
 			Lcd_Write_Char(' ');
 			Lcd_Set_Cursor(2,i);
 			i--;
+		}
+		else if (i < 4) { 		// Stores a key value and add an asterisk in display
+			Lcd_Write_Char('*');
+			i++;
 		}
 		keycheck();
 	}
