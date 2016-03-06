@@ -21,17 +21,16 @@ int main()
     Lcd_Init();
     while(1)
     {
-	    Lcd_Clear();
-		// Intro
-        Lcd_Set_Cursor(1,1);
+    	Lcd_Clear();
+	// Intro
+	Lcd_Set_Cursor(1,1);
         Lcd_Write_String("B23 CE");
-		Lcd_Set_Cursor(2,1);
-		Lcd_Write_String("Password lock");
-		__delay_ms(1000);
-		setPass();
+	Lcd_Set_Cursor(2,1);
+	Lcd_Write_String("Password lock");
+	__delay_ms(1000);
+	setPass();
 	
-
-		endp();
+	endp();
     }
     return 0;
 }
