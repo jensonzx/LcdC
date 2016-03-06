@@ -9,7 +9,7 @@
 #include <htc.h>
 #include "lcd.h"
 
-void port_init(), keycheck(), endp(), setPass(), pwmatch(), entpw(), clrkey();;
+void port_init(), keycheck(), endp(), setPass(), pwmatch(), entpw(), clrkey();
 char keyscan();
 char pass[5], key[5];
 unsigned int count = 0;
