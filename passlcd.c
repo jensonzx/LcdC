@@ -22,18 +22,35 @@ int main()
 	while(1)
 	{
 		Lcd_Clear();
-		// Intro
-		Lcd_Set_Cursor(1,1);
-		Lcd_Write_String("B23 CE");
-		Lcd_Set_Cursor(2,1);
-		Lcd_Write_String("Password lock");
-		__delay_ms(1000);
-		setPass();
-	
-
-		endp();
+	// Intro
+	Lcd_Set_Cursor(1,1);
+	Lcd_Write_String("     B23 CE");
+	Lcd_Set_Cursor(2,1);
+	Lcd_Write_String("  Password lock");
+	__delay_ms(1000);
+	setPass();
+	Lcd_Clear();
+hr:	entpw();
+	Lcd_Clear();
+	pwmatch();
+	if(nm == '0')
+	{	
+		Lcd_Write_String(" Access Granted!");
+		__delay_ms(1500);
+		Lcd_Clear();
 	}
-	return 0;
+	else if(nm == '1')
+	{	
+		Lcd_Write_String(" Access Denied!");
+		Lcd_Set_Cursor(2,1);
+		Lcd_Write_String("Please Try Again");
+		__delay_ms(1500);
+		Lcd_Clear();				
+		goto hr;
+	}
+	endp();
+	}
+    return 0;
 }
 
 // Initialize all ports
@@ -132,4 +149,44 @@ ts:	Lcd_Clear();
 	Lcd_Set_Cursor(1,1);
 	Lcd_Write_String("Password set");
 	__delay_ms(2000);
+}
+
+void pwmatch() // To Match Password Key In
+{ 
+	for (x = 0; x < 4; x++) 
+	{
+		if (key[x] != pass[x])
+		{	
+			nm = '1';		
+		}
+		else if(key[x] = pass[x])
+		{
+			nm = '0';	
+		}
+	}
+}
+
+void entpw() // To Enter Password
+{
+	Lcd_Clear();
+	Lcd_Set_Cursor(1,1);
+	Lcd_Write_String("Enter Password:");
+	Lcd_Set_Cursor(2,1);
+	while(z < 4)
+	{
+		key[z] = keyscan();
+		if (key[z] != '-' && z < 4)
+		{	
+			Lcd_Write_Char(key[z]);
+			z++;
+		}
+		else if (z > 0 && key[z] == '-')
+		{
+			Lcd_Set_Cursor(2,z);
+			Lcd_Write_Char(' ');
+			Lcd_Set_Cursor(2,z);
+			z--;
+		}		
+		keycheck();
+	}	
 }
