@@ -9,10 +9,10 @@
 #include <htc.h>
 #include "lcd.h"
 
-void port_init(), keycheck(), endp(), setPass(), pwmatch(), entpw(), clrkey();
+void port_init(), keycheck(), endp(), setPass(), entpw();
 char keyscan();
 char pass[5], key[5];
-unsigned int count = 0;
+unsigned int count = 0, match(), z;
 
 int main()
 {
@@ -22,33 +22,17 @@ int main()
 	while(1)
 	{
 		Lcd_Clear();
-	// Intro
-	Lcd_Set_Cursor(1,1);
-	Lcd_Write_String("     B23 CE");
-	Lcd_Set_Cursor(2,1);
-	Lcd_Write_String("  Password lock");
-	__delay_ms(1000);
-	setPass();
-	Lcd_Clear();
-hr:	entpw();
-	Lcd_Clear();
-	pwmatch();
-	if(nm == '0')
-	{	
-		Lcd_Write_String(" Access Granted!");
-		__delay_ms(1500);
-		Lcd_Clear();
-	}
-	else if(nm == '1')
-	{	
-		Lcd_Write_String(" Access Denied!");
+		// Intro
+		Lcd_Set_Cursor(1,1);
+		Lcd_Write_String("     B23 CE");
 		Lcd_Set_Cursor(2,1);
-		Lcd_Write_String("Please Try Again");
-		__delay_ms(1500);
-		Lcd_Clear();				
-		goto hr;
-	}
-	endp();
+		Lcd_Write_String("  Password lock");
+		__delay_ms(1000);
+		setPass();
+		Lcd_Clear();
+hr:		entpw();
+		
+		endp();
 	}
     return 0;
 }
@@ -120,7 +104,7 @@ ts:	Lcd_Clear();
 
 	while (i < 5) {
 		pass[i] = keyscan();
-		if (pass[i] == '#') {	// Checks if #(OK) is pressed
+		if (pass[i] == '#') {		// Checks if #(OK) is pressed
 			if (i < 4) { 		// If key count is less than 4, it will
 				Lcd_Clear();	// display to user that the password is too short
 				Lcd_Write_String("Too short");
@@ -151,42 +135,50 @@ ts:	Lcd_Clear();
 	__delay_ms(2000);
 }
 
-void pwmatch() // To Match Password Key In
-{ 
-	for (x = 0; x < 4; x++) 
-	{
-		if (key[x] != pass[x])
-		{	
-			nm = '1';		
-		}
-		else if(key[x] = pass[x])
-		{
-			nm = '0';	
+int match() {	// Checks whether if the passwords matches
+	for (int i = 0; i < 4; i++) {
+		if (key[i] != pass[i]) {
+			return 1;
 		}
 	}
+	return 0;
 }
 
 void entpw() // To Enter Password
 {
-	Lcd_Clear();
+wp:	Lcd_Clear();
 	Lcd_Set_Cursor(1,1);
 	Lcd_Write_String("Enter Password:");
 	Lcd_Set_Cursor(2,1);
-	while(z < 4)
-	{
+		while (z < 5) {
 		key[z] = keyscan();
-		if (key[z] != '-' && z < 4)
-		{	
-			Lcd_Write_Char(key[z]);
-			z++;
+		if (key[z] == '#' && z == 4) {	// Checks if #(OK) is pressed
+			z++;			// If there are 4 keys, proceed to submit
 		}
-		else if (z > 0 && key[z] == '-')
-		{
+		else if (z > 0 && key[z] == '*'){ // Erase the most recent key
 			Lcd_Set_Cursor(2,z);
 			Lcd_Write_Char(' ');
 			Lcd_Set_Cursor(2,z);
 			z--;
-		}		
+		}
+		else if (z < 4 && key[z] != '*') {	// Stores a key value and
+			Lcd_Write_Char('*');		// adds an asterisk in display
+			z++;
+		}
 		keycheck();
-	}	
+	}
+	if (match() == 0) {
+		Lcd_Clear();
+		Lcd_Set_Cursor(1,1);
+		Lcd_Write_String("Unlocked!");
+		__delay_ms(1500);
+	}
+	else if (match() == 1) {
+		Lcd_Clear();
+		Lcd_Set_Cursor(1,1);
+		Lcd_Write_String("Wrong password");
+		__delay_ms(1500);
+		z = 0;
+		goto wp;
+	}
 }
