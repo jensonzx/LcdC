@@ -103,18 +103,22 @@ wr:	Lcd_Clear();
 
 	while (i < 5) {
 		pass[i] = keyscan();
+		/* Checks if #(OK) is pressed
+		If key count is less than 4, it will
+		display to user that the password is too short */
 		if (pass[i] == '#') {
 			if (i < 4) {
 				Lcd_Clear();
 				Lcd_Write_String("Too short");
 				__delay_ms(1500);
-				i = 0;
+				i = 0; // Resets function
 				goto wr;
 			}
 			else {
 				i++;
 			}
 		}
+		// Erase the most recent key
 		else if (pass[i] != '-' && i < 4) {
 			Lcd_Write_Char(pass[i]);
 			i++;
